@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Premedic Comercial — Intranet (Prototipo)</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --verde: #1A8C8C;
+    --verde-oscuro: #0D5C5C;
+    --verde-claro: #E1F5EE;
+    --verde-mid: #5DCAA5;
+    --texto: #1a1a1a;
+    --texto-sec: #6B7280;
+    --texto-ter: #9CA3AF;
+    --borde: #E5E7EB;
+    --fondo: #F8FAFB;
+    --blanco: #ffffff;
+    --amarillo-bg: #FAEEDA;
+    --amarillo-txt: #633806;
+    --rojo-bg: #FCEBEB;
+    --rojo-txt: #791F1F;
+    --font: 'DM Sans', sans-serif;
+    --mono: 'DM Mono', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--fondo); color: var(--texto); font-size: 14px; }
+
+  /* LAYOUT */
+  .app { display: flex; height: 100vh; overflow: hidden; }
+  .sidebar { width: 220px; min-width: 220px; background: var(--verde-oscuro); display: flex; flex-direction: column; }
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sb-logo { padding: 20px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+  .sb-logo-titulo { color: #fff; font-size: 15px; font-weight: 600; letter-spacing: -0.3px; }
+  .sb-logo-sub { color: rgba(255,255,255,0.5); font-size: 11px; margin-top: 2px; }
+  .sb-user { padding: 12px 16px; border-bottom: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 10px; }
+  .sb-avatar { width: 32px; height: 32px; border-radius: 50%; background: var(--verde); display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; color: #fff; }
+  .sb-user-name { color: #fff; font-size: 13px; font-weight: 500; }
+  .sb-user-role { color: rgba(255,255,255,0.5); font-size: 11px; }
+  .sb-nav { padding: 8px 0; flex: 1; }
+  .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 16px; color: rgba(255,255,255,0.65); font-size: 13px; cursor: pointer; border-left: 3px solid transparent; transition: all 0.15s; }
+  .nav-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+  .nav-item.activo { background: rgba(255,255,255,0.12); color: #fff; border-left-color: var(--verde-mid); }
+  .nav-item svg { width: 16px; height: 16px; opacity: 0.8; flex-shrink: 0; }
+  .sb-bottom { padding: 12px 16px; border-top: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.4); font-size: 12px; cursor: pointer; }
+  .sb-bottom:hover { color: rgba(255,255,255,0.8); }
+
+  /* TOPBAR */
+  .topbar { padding: 14px 24px; border-bottom: 1px solid var(--borde); display: flex; align-items: center; justify-content: space-between; background: var(--blanco); flex-shrink: 0; }
+  .topbar-titulo { font-size: 15px; font-weight: 600; }
+  .topbar-sub { font-size: 12px; color: var(--texto-sec); margin-top: 2px; }
+
+  /* CONTENIDO */
+  .contenido { flex: 1; overflow-y: auto; padding: 24px; background: var(--fondo); }
+
+  /* PANTALLAS */
+  .pantalla { display: none; }
+  .pantalla.activa { display: block; }
+
+  /* LOGIN */
+  .login-wrap { display: flex; align-items: center; justify-content: center; min-height: 100vh; background: var(--fondo); }
+  .login-card { background: var(--blanco); border: 1px solid var(--borde); border-radius: 16px; padding: 36px; width: 380px; box-shadow: 0 4px 24px rgba(0,0,0,0.06); }
+  .login-logo { text-align: center; margin-bottom: 28px; }
+  .login-icono { width: 56px; height: 56px; border-radius: 50%; background: var(--verde-claro); display: flex; align-items: center; justify-content: center; margin: 0 auto 12px; }
+  .login-titulo { font-size: 20px; font-weight: 600; color: var(--texto); }
+  .login-sub { font-size: 13px; color: var(--texto-sec); margin-top: 4px; }
+  .login-badge { display: inline-block; background: var(--verde-claro); color: var(--verde-oscuro); font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; margin-top: 8px; }
+
+  /* CARDS */
+  .card { background: var(--blanco); border: 1px solid var(--borde); border-radius: 12px; padding: 20px; margin-bottom: 16px; }
+  .card-titulo { font-size: 13px; font-weight: 600; color: var(--texto); margin-bottom: 16px; padding-bottom: 10px; border-bottom: 1px solid var(--borde); }
+
+  /* FORMULARIO */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .form-full { grid-column: 1 / -1; }
+  .form-label { font-size: 12px; color: var(--texto-sec); font-weight: 500; margin-bottom: 5px; display: block; }
+  .form-label .req { color: #E24B4A; }
+  .form-input { width: 100%; padding: 8px 10px; border: 1px solid var(--borde); border-radius: 8px; font-size: 13px; font-family: var(--font); color: var(--texto); background: var(--blanco); outline: none; transition: border-color 0.15s; }
+  .form-input:focus { border-color: var(--verde); }
+  .form-input:disabled { background: var(--fondo); color: var(--texto-ter); }
+  .form-input.mono { font-family: var(--mono); }
+  select.form-input { cursor: pointer; }
+  textarea.form-input { resize: vertical; min-height: 72px; }
+  .upload-area { border: 1.5px dashed var(--borde); border-radius: 8px; padding: 20px; text-align: center; color: var(--texto-ter); font-size: 13px; cursor: pointer; transition: all 0.15s; }
+  .upload-area:hover { border-color: var(--verde); color: var(--verde); background: var(--verde-claro); }
+  .campo-oculto { display: none; }
+  .regla-hint { font-size: 11px; padding: 8px 12px; border-radius: 8px; margin-top: 4px; border-left: 3px solid var(--verde); background: var(--verde-claro); color: var(--verde-oscuro); }
+  .regla-hint.warn { border-left-color: #854F0B; background: var(--amarillo-bg); color: var(--amarillo-txt); }
+  .regla-hint.neutral { border-left-color: var(--borde); background: var(--fondo); color: var(--texto-ter); }
+
+  /* BOTONES */
+  .btn { padding: 9px 20px; border-radius: 8px; font-size: 13px; font-weight: 500; cursor: pointer; border: none; font-family: var(--font); transition: all 0.15s; }
+  .btn-primario { background: var(--verde); color: #fff; }
+  .btn-primario:hover { background: var(--verde-oscuro); }
+  .btn-outline { background: transparent; border: 1px solid var(--borde); color: var(--texto); padding: 5px 12px; font-size: 12px; }
+  .btn-outline:hover { background: var(--fondo); }
+
+  /* TABLA */
+  .tabla-wrap { overflow: hidden; border-radius: 12px; border: 1px solid var(--borde); margin-bottom: 16px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; background: var(--blanco); }
+  th { text-align: left; padding: 10px 14px; font-size: 11px; font-weight: 600; color: var(--texto-sec); border-bottom: 1px solid var(--borde); background: var(--fondo); letter-spacing: 0.04em; text-transform: uppercase; white-space: nowrap; }
+  td { padding: 10px 14px; border-bottom: 1px solid var(--borde); vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: #F9FAFB; }
+
+  /* BADGES */
+  .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 500; }
+  .badge-pend { background: var(--amarillo-bg); color: var(--amarillo-txt); }
+  .badge-auth { background: var(--verde-claro); color: var(--verde-oscuro); }
+  .badge-rech { background: var(--rojo-bg); color: var(--rojo-txt); }
+  .id-badge { font-family: var(--mono); font-size: 11px; color: var(--verde-oscuro); background: var(--verde-claro); padding: 3px 8px; border-radius: 6px; }
+
+  /* OBSERVACIONES */
+  .obs-item { padding: 10px 12px; border-left: 3px solid var(--verde); background: #F9FFFE; margin-bottom: 8px; border-radius: 0 8px 8px 0; }
+  .obs-item.admin { border-left-color: var(--verde-oscuro); background: #F0F9FF; }
+  .obs-item.estado { border-left-color: #854F0B; background: var(--amarillo-bg); }
+  .obs-item.sistema { border-left-color: #9CA3AF; background: var(--fondo); }
+  .obs-meta { font-size: 11px; color: var(--texto-sec); margin-bottom: 4px; font-weight: 500; }
+  .obs-texto { font-size: 13px; color: var(--texto); }
+  .obs-fecha { font-size: 11px; color: var(--texto-ter); margin-top: 4px; }
+
+  /* DOCUMENTOS */
+  .doc-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border: 1px solid var(--borde); border-radius: 8px; margin-bottom: 8px; background: var(--blanco); }
+  .doc-icono { width: 32px; height: 32px; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-weight: 700; flex-shrink: 0; }
+  .doc-pdf { background: var(--rojo-bg); color: var(--rojo-txt); }
+  .doc-jpg { background: #E6F1FB; color: #0C447C; }
+  .doc-nombre { font-size: 13px; color: var(--texto); flex: 1; }
+  .doc-size { font-size: 11px; color: var(--texto-ter); }
+  .doc-btn { font-size: 12px; color: var(--verde); cursor: pointer; background: none; border: none; font-family: var(--font); font-weight: 500; }
+  .doc-btn:hover { text-decoration: underline; }
+
+  /* MÉTRICAS */
+  .metricas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+  .metrica { background: var(--blanco); border: 1px solid var(--borde); border-radius: 12px; padding: 16px; }
+  .metrica-label { font-size: 12px; color: var(--texto-sec); font-weight: 500; margin-bottom: 6px; }
+  .metrica-valor { font-size: 26px; font-weight: 600; color: var(--texto); letter-spacing: -1px; }
+  .metrica-sub { font-size: 12px; color: var(--verde); margin-top: 4px; }
+  .metrica-sub.alerta { color: #854F0B; }
+
+  /* BARRAS */
+  .barra-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 13px; }
+  .barra-nombre { min-width: 100px; color: var(--texto-sec); }
+  .barra-bg { flex: 1; height: 8px; background: var(--fondo); border-radius: 4px; overflow: hidden; }
+  .barra-fill { height: 100%; border-radius: 4px; background: var(--verde); }
+  .barra-num { min-width: 24px; text-align: right; font-weight: 500; color: var(--texto); }
+
+  /* DETALLE GRID */
+  .detalle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px; }
+  .detalle-item .detalle-label { font-size: 11px; color: var(--texto-sec); font-weight: 500; margin-bottom: 3px; }
+  .detalle-item .detalle-valor { font-size: 13px; color: var(--texto); }
+
+  /* FILTROS */
+  .filtros { display: flex; gap: 8px; align-items: center; }
+  .filtro-select { padding: 6px 10px; border: 1px solid var(--borde); border-radius: 8px; font-size: 12px; font-family: var(--font); color: var(--texto); background: var(--blanco); cursor: pointer; }
+
+  /* NAV SUPERIOR PROTOTIPO */
+  .proto-nav { background: var(--verde-oscuro); padding: 10px 16px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .proto-nav-titulo { color: rgba(255,255,255,0.5); font-size: 12px; margin-right: 4px; }
+  .proto-btn { padding: 5px 14px; border-radius: 20px; font-size: 12px; border: 1px solid rgba(255,255,255,0.25); background: transparent; color: rgba(255,255,255,0.7); cursor: pointer; font-family: var(--font); transition: all 0.15s; }
+  .proto-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+  .proto-btn.on { background: var(--verde-mid); color: var(--verde-oscuro); border-color: var(--verde-mid); font-weight: 600; }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .metricas { grid-template-columns: 1fr 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .detalle-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV PROTOTIPO -->
+<div class="proto-nav">
+  <span class="proto-nav-titulo">Prototipo:</span>
+  <button class="proto-btn on" onclick="irA('login', this)">Login</button>
+  <button class="proto-btn" onclick="irA('formulario', this)">Formulario</button>
+  <button class="proto-btn" onclick="irA('pendiente', this)">Pendiente de aprobar</button>
+  <button class="proto-btn" onclick="irA('directas', this)">Ventas directas</button>
+  <button class="proto-btn" onclick="irA('desregulados', this)">Desregulados</button>
+  <button class="proto-btn" onclick="irA('owner', this)">Panel owner</button>
+</div>
+
+<!-- ==================== LOGIN ==================== -->
+<div id="pantalla-login" class="pantalla activa">
+  <div class="login-wrap">
+    <div class="login-card">
+      <div class="login-logo">
+        <div class="login-icono">
+          <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+            <circle cx="14" cy="10" r="5" fill="#1A8C8C"/>
+            <path d="M4 26c0-5.5 4.5-10 10-10s10 4.5 10 10" stroke="#1A8C8C" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+        <div class="login-titulo">Grupo Premedic</div>
+        <div class="login-sub">Agencia Comercial Oficial</div>
+        <div class="login-badge">Intranet Comercial</div>
+      </div>
+      <div style="margin-bottom: 14px;">
+        <label class="form-label">Código de usuario</label>
+        <input class="form-input mono" type="text" placeholder="Ej: VEN-001 / ADM-003"/>
+        <div style="font-size:11px;color:var(--texto-ter);margin-top:4px;">Código interno asignado por el administrador</div>
+      </div>
+      <div style="margin-bottom: 24px;">
+        <label class="form-label">Contraseña</label>
+        <input class="form-input" type="password" placeholder="••••••••"/>
+      </div>
+      <button class="btn btn-primario" style="width:100%;padding:11px;" onclick="irA('formulario', document.querySelectorAll('.proto-btn')[1])">Ingresar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== FORMULARIO ==================== -->
+<div id="pantalla-formulario" class="pantalla">
+  <div class="app">
+    <div class="sidebar">
+      <div class="sb-logo">
+        <div class="sb-logo-titulo">Grupo Premedic</div>
+        <div class="sb-logo-sub">Intranet comercial</div>
+      </div>
+      <div class="sb-user">
+        <div class="sb-avatar">JP</div>
+        <div>
+          <div class="sb-user-name">Juan Pérez</div>
+          <div class="sb-user-role">Vendedor · VEN-001</div>
+        </div>
+      </div>
+      <div class="sb-nav">
+        <div class="nav-item activo">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>
+          Formulario
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.5 4v4l3 1.5.5-1-2.5-1.25V5z"/></svg>
+          Pendiente de aprobar
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zm2 4h10v2H3zm2 4h6v2H5z"/></svg>
+          Ventas directas
+        </div>
+        <div class="nav-item">
+          <svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z"/></svg>
+          Desregulados
+        </div>
+      </div>
+      <div class="sb-bottom">Cerrar sesión</div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div>
+          <div class="topbar-titulo">Nuevo formulario de venta</div>
+          <div class="topbar-sub">Completá todos los campos obligatorios</div>
+        </div>
+        <span class="id-badge">#VTA-2026-0043</span>
+      </div>
+      <div class="contenido">
+        <div class="card">
+          <div class="card-titulo">Datos del afiliado</div>
+          <div class="form-grid">
+            <div>
+              <label class="form-label">Fecha de carga</label>
+              <input class="form-input" disabled value="18/04/2026"/>
+            </div>
+            <div>
+              <label class="form-label">CUIL <span class="req">*</span></label>
+              <input class="form-input" placeholder="20-12345678-9"/>
+            </div>
+            <div>
+              <label class="form-label">Nombre <span class="req">*</span></label>
+              <input class="form-input" placeholder="Nombre"/>
+            </div>
+            <div>
+              <label class="form-label">Apellido <span class="req">*</span></label>
+              <input class="form-input" placeholder="Apellido"/>
+            </div>
+            <div class="form-full">
+              <label class="form-label">Tipo de venta <span class="req">*</span></label>
+              <select class="form-input" id="tipo-venta" onchange="actualizarFormulario()">
+                <option value="">Seleccionar...</option>
+                <option value="desregulado">Desregulado</option>
+                <option value="directa">Directa</option>
+              </select>
+            </div>
+            <div class="form-full" id="campo-plan">
+              <label class="form-label">Plan de cobertura <span class="req">*</span></label>
+              <select class="form-input" id="select-plan" onchange="actualizarFormulario()">
+                <option value="">Seleccionar...</option>
+                <option value="pmo" id="op-pmo">PMO</option>
+                <option value="c100">C100</option>
+                <option value="200">200</option>
+                <option value="300">300</option>
+                <option value="400">400</option>
+                <option value="500">500</option>
+                <option value="mayores">Mayores</option>
+                <option value="simple">Plan simple</option>
+              </select>
+            </div>
+            <div class="form-full campo-oculto" id="campo-abona">
+              <label class="form-label">Abona diferencia <span class="req">*</span></label>
+              <select class="form-input">
+                <option value="">Seleccionar...</option>
+                <option>Sí</option>
+                <option>No</option>
+              </select>
+            </div>
+            <div id="hint-formulario" class="form-full">
+              <div class="regla-hint neutral">Seleccioná el tipo de venta para ver los campos correspondientes.</div>
+            </div>
+            <div class="form-full">
+              <label class="form-label">Observaciones</label>
+              <textarea class="form-input" placeholder="Observaciones adicionales..."></textarea>
+            </div>
+            <div class="form-full">
+              <label class="form-label">Adjuntar documentación</label>
+              <div class="upload-area">
+                <svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="margin:0 auto 6px;display:block;opacity:0.4"><path d="M10 3v10M6 7l4-4 4 4M4 15h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                Arrastrá archivos aquí o hacé clic para seleccionar<br/>
+                <span style="font-size:11px;color:var(--texto-ter)">PDF, JPG, PNG — sin límite de archivos</span>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+            <button class="btn btn-primario">Enviar formulario</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PENDIENTE DE APROBAR ==================== -->
+<div id="pantalla-pendiente" class="pantalla">
+  <div class="app">
+    <div class="sidebar">
+      <div class="sb-logo"><div class="sb-logo-titulo">Grupo Premedic</div><div class="sb-logo-sub">Intranet comercial</div></div>
+      <div class="sb-user"><div class="sb-avatar" style="background:#085041">MG</div><div><div class="sb-user-name">María García</div><div class="sb-user-role">Administrativo · ADM-001</div></div></div>
+      <div class="sb-nav">
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>Formulario</div>
+        <div class="nav-item activo"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.5 4v4l3 1.5.5-1-2.5-1.25V5z"/></svg>Pendiente de aprobar</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zm2 4h10v2H3zm2 4h6v2H5z"/></svg>Ventas directas</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z"/></svg>Desregulados</div>
+      </div>
+      <div class="sb-bottom">Cerrar sesión</div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div><div class="topbar-titulo">Pendiente de aprobar</div><div class="topbar-sub">Desregulados esperando revisión</div></div>
+        <span class="badge badge-pend">3 pendientes</span>
+      </div>
+      <div class="contenido">
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>ID Venta</th><th>Nombre y apellido</th><th>Fecha carga</th><th>Vendedor</th><th>Plan</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="id-badge">#VTA-2026-0039</span></td><td style="font-weight:500">López, Carlos</td><td style="color:var(--texto-sec)">12/04/2026</td><td>Juan Pérez</td><td>C100</td><td><span class="badge badge-pend">Pendiente</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0037</span></td><td style="font-weight:500">Rodríguez, Paula</td><td style="color:var(--texto-sec)">11/04/2026</td><td>Ana Martínez</td><td>300</td><td><span class="badge badge-pend">Pendiente</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0034</span></td><td style="font-weight:500">Sánchez, Miguel</td><td style="color:var(--texto-sec)">10/04/2026</td><td>Juan Pérez</td><td>500</td><td><span class="badge badge-auth">Autorizado</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card">
+          <div class="card-titulo">Detalle — #VTA-2026-0039 · López, Carlos</div>
+          <div class="detalle-grid">
+            <div class="detalle-item"><div class="detalle-label">Nombre y apellido</div><div class="detalle-valor" style="font-weight:600">López, Carlos</div></div>
+            <div class="detalle-item"><div class="detalle-label">CUIL</div><div class="detalle-valor">20-28456789-3</div></div>
+            <div class="detalle-item"><div class="detalle-label">Plan de cobertura</div><div class="detalle-valor">C100</div></div>
+            <div class="detalle-item"><div class="detalle-label">Abona diferencia</div><div class="detalle-valor">Sí</div></div>
+            <div class="detalle-item"><div class="detalle-label">Vendedor</div><div class="detalle-valor">Juan Pérez</div></div>
+            <div class="detalle-item"><div class="detalle-label">Fecha de creación del formulario</div><div class="detalle-valor" style="color:var(--verde);font-weight:500">12/04/2026 a las 14:30</div></div>
+          </div>
+          <div style="margin-bottom:16px;">
+            <label class="form-label">Cambiar estado</label>
+            <div style="display:flex;align-items:center;gap:10px;">
+              <select class="form-input" id="estado-sel" onchange="cambiarEstado()" style="max-width:240px;">
+                <option value="pend">Pendiente</option>
+                <option value="auth">Autorizado post venta</option>
+                <option value="rech">Rechazado</option>
+              </select>
+              <span id="estado-badge" class="badge badge-pend">Pendiente</span>
+            </div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="card-titulo">Documentación adjunta</div>
+            <div class="doc-item"><div class="doc-icono doc-pdf">PDF</div><div style="flex:1"><div class="doc-nombre">DNI_frente_Lopez.pdf</div><div class="doc-size">245 KB · Subido el 12/04/2026</div></div><button class="doc-btn">Descargar</button></div>
+            <div class="doc-item"><div class="doc-icono doc-pdf">PDF</div><div style="flex:1"><div class="doc-nombre">DNI_dorso_Lopez.pdf</div><div class="doc-size">198 KB · Subido el 12/04/2026</div></div><button class="doc-btn">Descargar</button></div>
+            <div class="doc-item"><div class="doc-icono doc-jpg">JPG</div><div style="flex:1"><div class="doc-nombre">recibo_sueldo_Lopez.jpg</div><div class="doc-size">1.2 MB · Subido el 12/04/2026</div></div><button class="doc-btn">Descargar</button></div>
+          </div>
+          <div class="card-titulo">Historial de observaciones y estados</div>
+          <div id="obs-lista">
+            <div class="obs-item sistema"><div class="obs-meta">Sistema</div><div class="obs-texto">Formulario creado por Juan Pérez</div><div class="obs-fecha">12/04/2026 a las 14:30</div></div>
+            <div class="obs-item"><div class="obs-meta">Juan Pérez · Vendedor</div><div class="obs-texto">El cliente prefiere inicio de cobertura desde el 1ro del mes próximo.</div><div class="obs-fecha">Cargado el 12/04/2026 a las 14:32</div></div>
+            <div class="obs-item admin"><div class="obs-meta">María García · Administrativo</div><div class="obs-texto">Revisado. Falta documentación de DNI. Se solicita al vendedor.</div><div class="obs-fecha">Cargado el 13/04/2026 a las 09:15</div></div>
+            <div class="obs-item estado"><div class="obs-meta">Cambio de estado</div><div class="obs-texto">Estado actualizado a <strong>Pendiente</strong></div><div class="obs-fecha">Registrado el 13/04/2026 a las 09:16</div></div>
+          </div>
+          <div style="display:flex;gap:10px;margin-top:14px;">
+            <textarea class="form-input" id="obs-input" rows="2" placeholder="Agregar observación... (se guardará con fecha automática)" style="flex:1;"></textarea>
+            <button class="btn btn-primario" style="align-self:flex-end;" onclick="agregarObs()">Enviar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== VENTAS DIRECTAS ==================== -->
+<div id="pantalla-directas" class="pantalla">
+  <div class="app">
+    <div class="sidebar">
+      <div class="sb-logo"><div class="sb-logo-titulo">Grupo Premedic</div><div class="sb-logo-sub">Intranet comercial</div></div>
+      <div class="sb-user"><div class="sb-avatar">JP</div><div><div class="sb-user-name">Juan Pérez</div><div class="sb-user-role">Vendedor · VEN-001</div></div></div>
+      <div class="sb-nav">
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>Formulario</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.5 4v4l3 1.5.5-1-2.5-1.25V5z"/></svg>Pendiente de aprobar</div>
+        <div class="nav-item activo"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zm2 4h10v2H3zm2 4h6v2H5z"/></svg>Ventas directas</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z"/></svg>Desregulados</div>
+      </div>
+      <div class="sb-bottom">Cerrar sesión</div>
+    </div>
+    <div class="main">
+      <div class="topbar"><div><div class="topbar-titulo">Ventas directas</div><div class="topbar-sub">Mis ventas directas registradas</div></div></div>
+      <div class="contenido">
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>ID Venta</th><th>Nombre y apellido</th><th>Fecha carga</th><th>Plan</th><th>Docs</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="id-badge">#VTA-2026-0042</span></td><td style="font-weight:500">Fernández, Luis</td><td style="color:var(--texto-sec)">14/04/2026</td><td>Plan simple</td><td><span class="badge badge-auth">2 archivos</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0038</span></td><td style="font-weight:500">Gómez, Laura</td><td style="color:var(--texto-sec)">11/04/2026</td><td>400</td><td><span class="badge badge-auth">1 archivo</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0031</span></td><td style="font-weight:500">Torres, Roberto</td><td style="color:var(--texto-sec)">08/04/2026</td><td>C100</td><td><span class="badge badge-auth">3 archivos</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== DESREGULADOS ==================== -->
+<div id="pantalla-desregulados" class="pantalla">
+  <div class="app">
+    <div class="sidebar">
+      <div class="sb-logo"><div class="sb-logo-titulo">Grupo Premedic</div><div class="sb-logo-sub">Intranet comercial</div></div>
+      <div class="sb-user"><div class="sb-avatar">JP</div><div><div class="sb-user-name">Juan Pérez</div><div class="sb-user-role">Vendedor · VEN-001</div></div></div>
+      <div class="sb-nav">
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>Formulario</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.5 4v4l3 1.5.5-1-2.5-1.25V5z"/></svg>Pendiente de aprobar</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zm2 4h10v2H3zm2 4h6v2H5z"/></svg>Ventas directas</div>
+        <div class="nav-item activo"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z"/></svg>Desregulados</div>
+      </div>
+      <div class="sb-bottom">Cerrar sesión</div>
+    </div>
+    <div class="main">
+      <div class="topbar"><div><div class="topbar-titulo">Desregulados</div><div class="topbar-sub">Listado completo con estados</div></div></div>
+      <div class="contenido">
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>ID Venta</th><th>Nombre y apellido</th><th>Fecha carga</th><th>Plan</th><th>Abona dif.</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="id-badge">#VTA-2026-0039</span></td><td style="font-weight:500">López, Carlos</td><td style="color:var(--texto-sec)">12/04/2026</td><td>C100</td><td>Sí</td><td><span class="badge badge-pend">Pendiente</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0034</span></td><td style="font-weight:500">Sánchez, Miguel</td><td style="color:var(--texto-sec)">10/04/2026</td><td>500</td><td>No</td><td><span class="badge badge-auth">Autorizado</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0028</span></td><td style="font-weight:500">Díaz, Marta</td><td style="color:var(--texto-sec)">07/04/2026</td><td>300</td><td>Sí</td><td><span class="badge badge-rech">Rechazado</span></td><td><button class="btn btn-outline">Ver detalle</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==================== PANEL OWNER ==================== -->
+<div id="pantalla-owner" class="pantalla">
+  <div class="app">
+    <div class="sidebar">
+      <div class="sb-logo"><div class="sb-logo-titulo">Grupo Premedic</div><div class="sb-logo-sub">Intranet comercial</div></div>
+      <div class="sb-user"><div class="sb-avatar" style="background:#533AB7">OW</div><div><div class="sb-user-name">Admin Owner</div><div class="sb-user-role" style="color:var(--verde-mid)">Owner · OWN-001</div></div></div>
+      <div class="sb-nav">
+        <div class="nav-item activo"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 1h6v6H1zm8 0h6v6H9zM1 9h6v6H1zm8 0h6v6H9z"/></svg>Dashboard</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M2 3h12v2H2zm0 4h12v2H2zm0 4h8v2H2z"/></svg>Formulario</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1a7 7 0 100 14A7 7 0 008 1zm-.5 4v4l3 1.5.5-1-2.5-1.25V5z"/></svg>Pendiente de aprobar</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M1 3h14v2H1zm2 4h10v2H3zm2 4h6v2H5z"/></svg>Ventas directas</div>
+        <div class="nav-item"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z"/></svg>Desregulados</div>
+      </div>
+      <div class="sb-bottom">Cerrar sesión</div>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div><div class="topbar-titulo">Panel owner — Dashboard</div><div class="topbar-sub">Resumen general de todas las ventas</div></div>
+        <div class="filtros">
+          <select class="filtro-select"><option>Todos los tipos</option><option>Directa</option><option>Desregulado</option></select>
+          <select class="filtro-select"><option>Todos los vendedores</option><option>Juan Pérez</option><option>Ana Martínez</option><option>Carlos Ruiz</option></select>
+          <select class="filtro-select"><option>Todos los estados</option><option>Pendiente</option><option>Autorizado</option><option>Rechazado</option></select>
+        </div>
+      </div>
+      <div class="contenido">
+        <div class="metricas">
+          <div class="metrica"><div class="metrica-label">Total ventas</div><div class="metrica-valor">42</div><div class="metrica-sub">Este mes</div></div>
+          <div class="metrica"><div class="metrica-label">Directas</div><div class="metrica-valor">28</div><div class="metrica-sub">66% del total</div></div>
+          <div class="metrica"><div class="metrica-label">Desregulados</div><div class="metrica-valor">14</div><div class="metrica-sub">33% del total</div></div>
+          <div class="metrica"><div class="metrica-label">Pendientes</div><div class="metrica-valor">3</div><div class="metrica-sub alerta">Requieren revisión</div></div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
+          <div class="card">
+            <div class="card-titulo">Ventas por vendedor</div>
+            <div class="barra-row"><span class="barra-nombre">Juan Pérez</span><div class="barra-bg"><div class="barra-fill" style="width:72%"></div></div><span class="barra-num">18</span></div>
+            <div class="barra-row"><span class="barra-nombre">Ana Martínez</span><div class="barra-bg"><div class="barra-fill" style="width:48%;background:var(--verde-mid)"></div></div><span class="barra-num">12</span></div>
+            <div class="barra-row"><span class="barra-nombre">Carlos Ruiz</span><div class="barra-bg"><div class="barra-fill" style="width:32%;background:#9FE1CB"></div></div><span class="barra-num">8</span></div>
+            <div class="barra-row"><span class="barra-nombre">Laura Sosa</span><div class="barra-bg"><div class="barra-fill" style="width:16%;background:#E1F5EE;border:1px solid #9FE1CB"></div></div><span class="barra-num">4</span></div>
+          </div>
+          <div class="card">
+            <div class="card-titulo">Planes más vendidos</div>
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;"><span>C100</span><span class="badge badge-auth">12 ventas</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;"><span>Plan simple</span><span class="badge badge-auth">9 ventas</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;"><span>300</span><span class="badge badge-pend">7 ventas</span></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px;"><span>500</span><span class="badge badge-pend">5 ventas</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="tabla-wrap">
+          <table>
+            <thead><tr><th>ID Venta</th><th>Fecha</th><th>Vendedor</th><th>Nombre y apellido</th><th>Tipo</th><th>Plan</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+              <tr><td><span class="id-badge">#VTA-2026-0042</span></td><td style="color:var(--texto-sec)">14/04/2026</td><td>Juan Pérez</td><td style="font-weight:500">Fernández, Luis</td><td>Directa</td><td>Plan simple</td><td><span class="badge badge-auth">Autorizado</span></td><td><button class="btn btn-outline">Ver</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0039</span></td><td style="color:var(--texto-sec)">12/04/2026</td><td>Juan Pérez</td><td style="font-weight:500">López, Carlos</td><td>Desregulado</td><td>C100</td><td><span class="badge badge-pend">Pendiente</span></td><td><button class="btn btn-outline">Ver</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0034</span></td><td style="color:var(--texto-sec)">10/04/2026</td><td>Ana Martínez</td><td style="font-weight:500">Sánchez, Miguel</td><td>Desregulado</td><td>500</td><td><span class="badge badge-auth">Autorizado</span></td><td><button class="btn btn-outline">Ver</button></td></tr>
+              <tr><td><span class="id-badge">#VTA-2026-0028</span></td><td style="color:var(--texto-sec)">07/04/2026</td><td>Ana Martínez</td><td style="font-weight:500">Díaz, Marta</td><td>Desregulado</td><td>300</td><td><span class="badge badge-rech">Rechazado</span></td><td><button class="btn btn-outline">Ver</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function irA(nombre, btn) {
+  document.querySelectorAll('.pantalla').forEach(p => p.classList.remove('activa'));
+  document.querySelectorAll('.proto-btn').forEach(b => b.classList.remove('on'));
+  document.getElementById('pantalla-' + nombre).classList.add('activa');
+  if(btn) btn.classList.add('on');
+}
+
+function actualizarFormulario() {
+  const tipo = document.getElementById('tipo-venta').value;
+  const plan = document.getElementById('select-plan').value;
+  const campoAbona = document.getElementById('campo-abona');
+  const opPmo = document.getElementById('op-pmo');
+  const hint = document.getElementById('hint-formulario').querySelector('.regla-hint');
+
+  if (tipo === 'directa') {
+    opPmo.style.display = 'none';
+    if (plan === 'pmo') document.getElementById('select-plan').value = '';
+    campoAbona.classList.add('campo-oculto');
+    hint.className = 'regla-hint warn';
+    hint.textContent = 'Venta directa: PMO y abona diferencia no aplican.';
+  } else if (tipo === 'desregulado') {
+    opPmo.style.display = '';
+    const mostrar = plan !== 'pmo' && plan !== '';
+    mostrar ? campoAbona.classList.remove('campo-oculto') : campoAbona.classList.add('campo-oculto');
+    if (plan === 'pmo') {
+      hint.className = 'regla-hint neutral';
+      hint.textContent = 'Plan PMO seleccionado: abona diferencia no aplica.';
+    } else if (plan === '') {
+      hint.className = 'regla-hint';
+      hint.textContent = 'Venta desregulada: seleccioná el plan para continuar.';
+    } else {
+      hint.className = 'regla-hint';
+      hint.textContent = 'Venta desregulada con plan ' + plan.toUpperCase() + ': completá abona diferencia.';
+    }
+  } else {
+    opPmo.style.display = '';
+    campoAbona.classList.add('campo-oculto');
+    hint.className = 'regla-hint neutral';
+    hint.textContent = 'Seleccioná el tipo de venta para ver los campos correspondientes.';
+  }
+}
+
+function ahora() {
+  const d = new Date();
+  return d.toLocaleDateString('es-AR', {day:'2-digit',month:'2-digit',year:'numeric'}) + ' a las ' + d.toLocaleTimeString('es-AR', {hour:'2-digit',minute:'2-digit'});
+}
+
+function agregarObs() {
+  const txt = document.getElementById('obs-input').value.trim();
+  if (!txt) return;
+  const lista = document.getElementById('obs-lista');
+  const div = document.createElement('div');
+  div.className = 'obs-item admin';
+  div.innerHTML = '<div class="obs-meta">María García · Administrativo</div><div class="obs-texto">' + txt + '</div><div class="obs-fecha">Cargado el ' + ahora() + '</div>';
+  lista.appendChild(div);
+  document.getElementById('obs-input').value = '';
+  lista.scrollTop = lista.scrollHeight;
+}
+
+function cambiarEstado() {
+  const sel = document.getElementById('estado-sel');
+  const badge = document.getElementById('estado-badge');
+  const val = sel.value;
+  const labels = {pend:'Pendiente', auth:'Autorizado post venta', rech:'Rechazado'};
+  const clases = {pend:'badge badge-pend', auth:'badge badge-auth', rech:'badge badge-rech'};
+  badge.className = clases[val];
+  badge.textContent = labels[val];
+  const lista = document.getElementById('obs-lista');
+  const div = document.createElement('div');
+  div.className = 'obs-item estado';
+  div.innerHTML = '<div class="obs-meta">Cambio de estado · María García</div><div class="obs-texto">Estado actualizado a <strong>' + labels[val] + '</strong></div><div class="obs-fecha">Registrado el ' + ahora() + '</div>';
+  lista.appendChild(div);
+  lista.scrollTop = lista.scrollHeight;
+}
+</script>
+</body>
+</html>
