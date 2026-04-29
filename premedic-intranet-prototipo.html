@@ -174,10 +174,10 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
 .solo-vend-flex{display:none}
 
 /* CAMPANA NOTIFICACIONES */
-.bell-wrap{position:relative;cursor:pointer;display:inline-flex;align-items:center}
-.bell-wrap svg{color:rgba(255,255,255,0.7);transition:.15s}
-.bell-wrap:hover svg{color:#fff}
-.bell-dot{position:absolute;top:-2px;right:-2px;width:16px;height:16px;background:#E24B4A;border-radius:50%;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;border:2px solid var(--verde-o)}
+.bell-wrap{position:relative;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;width:36px;height:36px}
+.bell-wrap svg{position:relative;z-index:1;color:#fff;width:20px;height:20px;flex-shrink:0}
+.bell-wrap:hover svg{color:var(--verde-m)}
+.bell-dot{position:absolute;top:0px;right:0px;min-width:17px;height:17px;background:#FF6B00;border-radius:9px;font-size:9px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center;padding:0 3px;z-index:2;pointer-events:none}
 .notif-panel{position:absolute;top:32px;right:0;width:300px;background:var(--blanco);border:1px solid var(--borde);border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,0.12);z-index:200;display:none}
 .notif-panel.on{display:block}
 .notif-header{padding:10px 14px;font-size:12px;font-weight:600;border-bottom:1px solid var(--borde);display:flex;justify-content:space-between;align-items:center}
@@ -256,8 +256,8 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
           <div class="bell-dot">2</div>
           <div class="notif-panel" id="notif-form">
             <div class="notif-header"><span>Notificaciones</span><span style="font-size:10px;color:var(--verde);cursor:pointer">Marcar todas como leídas</span></div>
-            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0039</div><div class="notif-s">María García agregó una observación</div><div class="notif-f">Hace 5 minutos</div></div>
-            <div class="notif-item notif-unread"><div class="notif-t">Estado actualizado #VTA-2026-0037</div><div class="notif-s">Cambió a Autorizado post venta</div><div class="notif-f">Hace 1 hora</div></div>
+            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0039</div><div class="notif-s">El Administrativo María García ha añadido una observación al afiliado López, Carlos</div><div class="notif-f">Hace 5 minutos</div></div>
+            <div class="notif-item notif-unread"><div class="notif-t">Estado actualizado #VTA-2026-0037</div><div class="notif-s">El afiliado López, Carlos ha cambiado de estado a "Autorizado post venta"</div><div class="notif-f">Hace 1 hora</div></div>
           </div>
         </div>
       </div>
@@ -321,14 +321,14 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
                 </select>
               </div>
 
-              <!-- FORMA DE PAGO (solo directa) -->
+              <!-- FORMA DE PAGO (ambos tipos) -->
               <div class="full oculto" id="campo-pago">
                 <label class="fl">Forma de pago <span class="req">*</span></label>
-                <select>
+                <select id="select-pago">
                   <option value="">Seleccionar...</option>
-                  <option>LINK CBU</option>
-                  <option>LINK TC</option>
-                  <option>TRANSFERENCIA</option>
+                  <option value="link-cbu">LINK CBU</option>
+                  <option value="link-tc">LINK TC</option>
+                  <option value="transferencia">TRANSFERENCIA</option>
                 </select>
               </div>
 
@@ -378,8 +378,8 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
           <div class="bell-dot">1</div>
           <div class="notif-panel" id="notif-pend">
             <div class="notif-header"><span>Notificaciones</span><span style="font-size:10px;color:var(--verde);cursor:pointer">Marcar todas como leídas</span></div>
-            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0039</div><div class="notif-s">Juan Pérez adjuntó el DNI del cliente</div><div class="notif-f">Hace 5 minutos</div></div>
-            <div class="notif-item"><div class="notif-t">Nueva obs. en #VTA-2026-0037</div><div class="notif-s">Juan Pérez agregó una observación</div><div class="notif-f">Hace 2 horas</div></div>
+            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0039</div><div class="notif-s">El Vendedor Juan Pérez ha añadido una observación al afiliado López, Carlos</div><div class="notif-f">Hace 5 minutos</div></div>
+            <div class="notif-item"><div class="notif-t">Nueva obs. en #VTA-2026-0037</div><div class="notif-s">El Vendedor Juan Pérez ha añadido una observación al afiliado Rodríguez, Paula</div><div class="notif-f">Hace 2 horas</div></div>
           </div>
         </div>
       </div>
@@ -397,7 +397,7 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
           <tbody>
             <tr><td><span class="id-b">#VTA-2026-0039</span></td><td style="font-weight:500">López, Carlos</td><td style="color:var(--txt2)">12/04/2026</td><td>Juan Pérez</td><td>C100</td><td><span class="badge b-amarillo">Pendiente</span></td><td><button class="btn btn-o" onclick="mostrarDetalle('det-pend')">Ver detalle</button></td></tr>
             <tr><td><span class="id-b">#VTA-2026-0037</span></td><td style="font-weight:500">Rodríguez, Paula</td><td style="color:var(--txt2)">11/04/2026</td><td>Ana Martínez</td><td>300</td><td><span class="badge b-amarillo">Pendiente</span></td><td><button class="btn btn-o">Ver detalle</button></td></tr>
-            <tr><td><span class="id-b">#VTA-2026-0034</span></td><td style="font-weight:500">Sánchez, Miguel</td><td style="color:var(--txt2)">10/04/2026</td><td>Juan Pérez</td><td>500</td><td><span class="badge b-verde">Autorizado</span></td><td><button class="btn btn-o">Ver detalle</button></td></tr>
+            <tr><td><span class="id-b">#VTA-2026-0036</span></td><td style="font-weight:500">Romero, Diego</td><td style="color:var(--txt2)">09/04/2026</td><td>Carlos Ruiz</td><td>400</td><td><span class="badge b-amarillo">Pendiente</span></td><td><button class="btn btn-o">Ver detalle</button></td></tr>
           </tbody>
         </table>
       </div>
@@ -452,7 +452,7 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
             <textarea id="obs-input-pend" rows="2" placeholder="Agregar observación..." style="flex:1"></textarea>
-            <button class="btn btn-p" style="align-self:flex-end" onclick="agregarObs('obs-pend','obs-input-pend','María García','Administrativo','notif-pend')">Enviar</button>
+            <button class="btn btn-p" style="align-self:flex-end" onclick="agregarObs('obs-pend','obs-input-pend','María García','Administrativo','notif-pend','López, Carlos')">Enviar</button>
           </div>
         </div>
         <div id="tc-docs-pend" class="tab-content">
@@ -488,8 +488,8 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
         <div class="bell-dot">2</div>
         <div class="notif-panel" id="notif-dir">
           <div class="notif-header"><span>Notificaciones</span><span style="font-size:10px;color:var(--verde);cursor:pointer">Marcar todas como leídas</span></div>
-          <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0042</div><div class="notif-s">Juan Pérez adjuntó documentación</div><div class="notif-f">Hace 10 minutos</div></div>
-          <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0038</div><div class="notif-s">Ana Martínez agregó una observación</div><div class="notif-f">Hace 3 horas</div></div>
+          <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0042</div><div class="notif-s">El Vendedor Juan Pérez ha añadido una observación al afiliado Fernández, Luis</div><div class="notif-f">Hace 10 minutos</div></div>
+          <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0038</div><div class="notif-s">El Vendedor Ana Martínez ha añadido una observación al afiliado Gómez, Laura</div><div class="notif-f">Hace 3 horas</div></div>
         </div>
       </div>
     </div>
@@ -581,7 +581,7 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
             <textarea id="obs-input-dir" rows="2" placeholder="Agregar observación..." style="flex:1"></textarea>
-            <button class="btn btn-p" style="align-self:flex-end" onclick="agregarObs('obs-dir','obs-input-dir','María García','Administrativo','notif-dir')">Enviar</button>
+            <button class="btn btn-p" style="align-self:flex-end" onclick="agregarObs('obs-dir','obs-input-dir','María García','Administrativo','notif-dir','Fernández, Luis')">Enviar</button>
           </div>
         </div>
         <div id="tc-docs-dir" class="tab-content">
@@ -621,7 +621,7 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
           <div class="bell-dot">1</div>
           <div class="notif-panel" id="notif-des">
             <div class="notif-header"><span>Notificaciones</span><span style="font-size:10px;color:var(--verde);cursor:pointer">Marcar todas como leídas</span></div>
-            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0034</div><div class="notif-s">Juan Pérez adjuntó documentación adicional</div><div class="notif-f">Hace 15 minutos</div></div>
+            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0034</div><div class="notif-s">El Vendedor Juan Pérez ha añadido una observación al afiliado Fernández, Luis adicional</div><div class="notif-f">Hace 15 minutos</div></div>
           </div>
         </div>
       </div>
@@ -716,7 +716,7 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
           </div>
           <div style="display:flex;gap:8px;margin-top:12px">
             <textarea id="obs-input-des" rows="2" placeholder="Agregar observación..." style="flex:1"></textarea>
-            <button class="btn btn-p" style="align-self:flex-end" onclick="agregarObs('obs-des','obs-input-des','María García','Administrativo','notif-des')">Enviar</button>
+            <button class="btn btn-p" style="align-self:flex-end" onclick="agregarObs('obs-des','obs-input-des','María García','Administrativo','notif-des','Sánchez, Miguel')">Enviar</button>
           </div>
         </div>
         <div id="tc-docs-des" class="tab-content">
@@ -759,10 +759,10 @@ body.rol-vendedor .solo-vend-flex{display:flex!important}
           <div class="bell-dot">4</div>
           <div class="notif-panel" id="notif-own">
             <div class="notif-header"><span>Notificaciones</span><span style="font-size:10px;color:var(--verde);cursor:pointer">Marcar todas como leídas</span></div>
-            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0042</div><div class="notif-s">Juan Pérez adjuntó documentación</div><div class="notif-f">Hace 10 minutos</div></div>
+            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0042</div><div class="notif-s">El Vendedor Juan Pérez ha añadido una observación al afiliado Fernández, Luis</div><div class="notif-f">Hace 10 minutos</div></div>
             <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0039</div><div class="notif-s">María García cambió el estado</div><div class="notif-f">Hace 1 hora</div></div>
             <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0038</div><div class="notif-s">Ana Martínez agregó observación</div><div class="notif-f">Hace 3 horas</div></div>
-            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0034</div><div class="notif-s">Juan Pérez adjuntó documentación adicional</div><div class="notif-f">Hace 5 horas</div></div>
+            <div class="notif-item notif-unread"><div class="notif-t">Nueva obs. en #VTA-2026-0034</div><div class="notif-s">El Vendedor Juan Pérez ha añadido una observación al afiliado Fernández, Luis adicional</div><div class="notif-f">Hace 5 horas</div></div>
           </div>
         </div>
       </div>
@@ -873,8 +873,11 @@ function actualizarForm() {
     campoAbona.classList.add('oculto');
     campoPago.classList.remove('oculto');
     descPregunta.classList.remove('oculto');
-    // Descuentos para directa
-    selectDesc.innerHTML = '<option value="">Seleccionar...</option><option>EDT10</option><option>TC15</option><option>CBU15</option><option>PRE40</option><option>MZA25</option><option>TUC25</option><option>MIS25</option>';
+    // Descuentos directa con valores
+    selectDesc.innerHTML = '<option value="">Seleccionar...</option><option value="EDT10">EDT10</option><option value="TC15">TC15</option><option value="CBU15">CBU15</option><option value="PRE40">PRE40 (3 meses)</option><option value="MZA25">MZA25</option><option value="TUC25">TUC25</option><option value="MIS25">MIS25</option>';
+    selectDesc.onchange = filtrarPagoPorDescuento;
+    // Resetear pago
+    document.getElementById('select-pago').innerHTML = '<option value="">Seleccionar...</option><option value="link-cbu">LINK CBU</option><option value="link-tc">LINK TC</option><option value="transferencia">TRANSFERENCIA</option>';
   } else if (tipo === 'desregulado') {
     fCuil.classList.remove('oculto');
     fDni.classList.add('oculto');
@@ -882,19 +885,50 @@ function actualizarForm() {
     opMayores.style.display = 'none';
     opSimple.style.display = 'none';
     if (plan === 'mayores' || plan === 'simple') document.getElementById('select-plan').value = '';
-    campoPago.classList.add('oculto');
+    campoPago.classList.remove('oculto');
     descPregunta.classList.remove('oculto');
-    // Descuentos para desregulado
-    selectDesc.innerHTML = '<option value="">Seleccionar...</option><option>EDT10</option><option>TC15</option><option>CBU15</option><option>DTO40</option><option>MZA25</option><option>TUC25</option><option>MIS25</option>';
+    // Descuentos desregulado con valores
+    selectDesc.innerHTML = '<option value="">Seleccionar...</option><option value="EDT10">EDT10</option><option value="TC15">TC15</option><option value="CBU15">CBU15</option><option value="DTO40">DTO40 (6 meses)</option><option value="MZA25">MZA25</option><option value="TUC25">TUC25</option><option value="MIS25">MIS25</option>';
+    selectDesc.onchange = filtrarPagoPorDescuento;
+    // Resetear pago
+    document.getElementById('select-pago').innerHTML = '<option value="">Seleccionar...</option><option value="link-cbu">LINK CBU</option><option value="link-tc">LINK TC</option><option value="transferencia">TRANSFERENCIA</option>';
     // Abona diferencia
     if (plan === 'pmo') { campoAbona.classList.add('oculto'); }
     else { campoAbona.classList.remove('oculto'); }
   }
 }
 
+// ---- MAPA DESCUENTO → FORMAS DE PAGO PERMITIDAS ----
+const pagosPorDescuento = {
+  'EDT10': ['transferencia'],
+  'TC15':  ['link-tc'],
+  'CBU15': ['link-cbu'],
+  'PRE40': ['link-tc'],
+  'DTO40': ['transferencia','link-tc','link-cbu'],
+  'MZA25': ['transferencia','link-tc','link-cbu'],
+  'TUC25': ['transferencia','link-tc','link-cbu'],
+  'MIS25': ['transferencia','link-tc','link-cbu'],
+};
+const labelsPago = {'link-cbu':'LINK CBU','link-tc':'LINK TC','transferencia':'TRANSFERENCIA'};
+
+function filtrarPagoPorDescuento() {
+  const desc = document.getElementById('select-descuento').value;
+  const selPago = document.getElementById('select-pago');
+  const opcTodas = '<option value="">Seleccionar...</option><option value="link-cbu">LINK CBU</option><option value="link-tc">LINK TC</option><option value="transferencia">TRANSFERENCIA</option>';
+  if (!desc || !pagosPorDescuento[desc]) { selPago.innerHTML = opcTodas; return; }
+  const permitidos = pagosPorDescuento[desc];
+  selPago.innerHTML = '<option value="">Seleccionar...</option>' + permitidos.map(p => '<option value="' + p + '">' + labelsPago[p] + '</option>').join('');
+  // Si solo hay una opción la selecciona automáticamente
+  if (permitidos.length === 1) selPago.value = permitidos[0];
+}
+
 function toggleDescuento(tiene) {
   const lista = document.getElementById('campo-descuento-lista');
   tiene ? lista.classList.remove('oculto') : lista.classList.add('oculto');
+  if (!tiene) {
+    const sel = document.getElementById('select-pago');
+    if (sel) sel.innerHTML = '<option value="">Seleccionar...</option><option value="link-cbu">LINK CBU</option><option value="link-tc">LINK TC</option><option value="transferencia">TRANSFERENCIA</option>';
+  }
 }
 
 // ---- TABS ----
@@ -920,17 +954,24 @@ function ahora() {
 }
 
 // ---- AGREGAR OBS ----
-function agregarObs(listaId, inputId, nombre, rol, notifId) {
+// afiliadoNombre: nombre del afiliado para la notificación
+function agregarObs(listaId, inputId, nombre, rol, notifId, afiliadoNombre) {
   const txt = document.getElementById(inputId).value.trim();
   if (!txt) return;
   const lista = document.getElementById(listaId);
   const div = document.createElement('div');
-  div.className = 'obs adm';
+  div.className = rol === 'Vendedor' ? 'obs' : 'obs adm';
   div.innerHTML = '<div class="obs-m">' + nombre + ' · ' + rol + '</div><div class="obs-t">' + txt + '</div><div class="obs-f">Cargado el ' + ahora() + '</div>';
   lista.appendChild(div);
   document.getElementById(inputId).value = '';
-  // Agregar notificación
-  if (notifId) agregarNotif(notifId, 'Nueva observación agregada', nombre + ' agregó una observación');
+  // Notificación con mensaje exacto
+  if (notifId) {
+    const afiliado = afiliadoNombre || 'el afiliado';
+    agregarNotif(notifId,
+      'Nueva observación',
+      'El ' + rol + ' ' + nombre + ' ha añadido una observación al afiliado ' + afiliado
+    );
+  }
 }
 
 // ---- AGREGAR NOTIFICACIÓN ----
@@ -976,16 +1017,18 @@ function cambiarEstadoDir() {
   const badge = document.getElementById('badge-dir');
   badge.className = 'badge ' + info.cls;
   badge.textContent = info.txt;
-  // Vigencia solo para Solicitud Aceptada
   const vigencia = document.getElementById('campo-vigencia-dir');
   val === 'aceptada' ? vigencia.classList.remove('oculto') : vigencia.classList.add('oculto');
-  // Obs
   const lista = document.getElementById('obs-dir');
   const div = document.createElement('div');
   div.className = 'obs estado';
   div.innerHTML = '<div class="obs-m">Cambio de estado · María García</div><div class="obs-t">Estado actualizado a <strong>' + info.txt + '</strong></div><div class="obs-f">Registrado el ' + ahora() + '</div>';
   lista.appendChild(div);
-  agregarNotif('notif-dir', 'Estado actualizado', 'Cambió a ' + info.txt);
+  // Notificación con mensaje exacto
+  agregarNotif('notif-dir',
+    'Cambio de estado',
+    'El afiliado Fernández, Luis ha cambiado de estado a "' + info.txt + '"'
+  );
 }
 
 // ---- CAMBIAR ESTADO DESREGULADOS ----
@@ -995,31 +1038,65 @@ function cambiarEstadoDes() {
   const badge = document.getElementById('badge-des');
   badge.className = 'badge ' + info.cls;
   badge.textContent = info.txt;
-  // Vigencia solo para Traspaso OK
   const vigencia = document.getElementById('campo-vigencia-des');
   val === 'tok' ? vigencia.classList.remove('oculto') : vigencia.classList.add('oculto');
-  // Obs
   const lista = document.getElementById('obs-des');
   const div = document.createElement('div');
   div.className = 'obs estado';
   div.innerHTML = '<div class="obs-m">Cambio de estado · María García</div><div class="obs-t">Estado actualizado a <strong>' + info.txt + '</strong></div><div class="obs-f">Registrado el ' + ahora() + '</div>';
   lista.appendChild(div);
-  agregarNotif('notif-des', 'Estado actualizado', 'Cambió a ' + info.txt);
+  // Notificación con mensaje exacto
+  agregarNotif('notif-des',
+    'Cambio de estado',
+    'El afiliado Sánchez, Miguel ha cambiado de estado a "' + info.txt + '"'
+  );
 }
 
-// ---- CAMBIAR ESTADO PENDIENTE ----
+// ---- CAMBIAR ESTADO PENDIENTE (con lógica de mover a desregulados) ----
 function cambiarEstado(selId, badgeId, obsId) {
   const val = document.getElementById(selId).value;
-  const mapa = {pend:{txt:'Pendiente',cls:'b-amarillo'}, auth:{txt:'Autorizado post venta',cls:'b-verde'}, rech:{txt:'Rechazado',cls:'b-rojo'}};
+  const mapa = {
+    pend: {txt:'Pendiente', cls:'b-amarillo'},
+    auth: {txt:'Autorizado post venta', cls:'b-naranja'},
+    rech: {txt:'Rechazado', cls:'b-rojo'}
+  };
   const info = mapa[val] || {txt:val, cls:'b-gray'};
   const badge = document.getElementById(badgeId);
   badge.className = 'badge ' + info.cls;
   badge.textContent = info.txt;
+  // Registrar en obs
   const lista = document.getElementById(obsId);
   const div = document.createElement('div');
   div.className = 'obs estado';
   div.innerHTML = '<div class="obs-m">Cambio de estado · María García</div><div class="obs-t">Estado actualizado a <strong>' + info.txt + '</strong></div><div class="obs-f">Registrado el ' + ahora() + '</div>';
   lista.appendChild(div);
+
+  // Si se autoriza o rechaza → simular que pasa a desregulados
+  if (val === 'auth' || val === 'rech') {
+    // Mostrar aviso visual
+    const det = document.getElementById('det-pend');
+    let aviso = det.querySelector('.aviso-mover');
+    if (!aviso) {
+      aviso = document.createElement('div');
+      aviso.className = 'aviso-mover';
+      aviso.style.cssText = 'margin-top:12px;padding:10px 14px;border-radius:8px;background:#E1F5EE;border-left:3px solid #1A8C8C;font-size:12px;color:#085041;font-weight:500';
+      det.appendChild(aviso);
+    }
+    aviso.innerHTML = val === 'auth'
+      ? '✅ Este registro pasó a <strong>Desregulados</strong> con estado "Autorizado post venta". El vendedor fue notificado.'
+      : '❌ Este registro pasó a <strong>Desregulados</strong> como "Rechazado". El vendedor fue notificado.';
+
+    // Notificación para el administrativo
+    agregarNotif('notif-pend',
+      'Cambio de estado',
+      'El afiliado López, Carlos ha cambiado de estado a "' + info.txt + '"'
+    );
+    // Notificación para el vendedor
+    agregarNotif('notif-form',
+      'Cambio de estado',
+      'El afiliado López, Carlos ha cambiado de estado a "' + info.txt + '"'
+    );
+  }
 }
 
 // ---- FILTRAR TABLA ----
@@ -1049,4 +1126,3 @@ function descargarExcel() {
 </script>
 </body>
 </html>
-
